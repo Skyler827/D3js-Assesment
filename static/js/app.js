@@ -1,3 +1,5 @@
+(async () => {
+
 // Basic parameters of the svg
 var margin = {
   top: 15,
@@ -24,13 +26,37 @@ var tooltip = d3.select('body')
 
 // Read and arrange the data
 
-
-
+const req = new XMLHttpRequest();
+var data = null;
+const reqDone = new Promise((resolve)=>{
+  req.addEventListener("load", function() {
+    data = JSON.parse(this.responseText);
+    console.log(data);
+    resolve();
+  });
+});
+req.open("GET", "/data/data.json");
+req.send();
+await reqDone;
 
 // Set scales
 
-
-
+// X axis: from min year to max year, inclusive
+// left Y axis: from zero to maxTotalGames, inclusive
+// right Y axis: from minPoints to maxPoints
+minYear = null;
+maxYear = null;
+maxTotalGames = null;
+minPoints = null;
+maxPoints = null;
+for (season of data) {
+  if (minYear === null || minYear > season.year) minYear = season.year;
+  if (maxYear === null || maxYear < season.year) maxYear = season.year;
+  const seasonGames = season.wins + season.draws + seasons.losses;
+  if (maxTotalGames === null || maxTotalGames < seasonGames) maxTotalGames = seasonGames;
+  if (minPoints === null || season.points < minPoints) minPoints = season.points;
+  if (maxPoints === null || season.points > maxPoints) maxPoints = season.points;
+}
 
 // Create axes
 
@@ -61,3 +87,5 @@ var tooltip = d3.select('body')
 
 
 // Legend function
+
+})
