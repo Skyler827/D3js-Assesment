@@ -31,7 +31,6 @@ var data = null;
 const reqDone = new Promise((resolve)=>{
   req.addEventListener("load", function() {
     data = JSON.parse(this.responseText);
-    console.log(data);
     resolve();
   });
 });
@@ -52,26 +51,47 @@ maxPoints = null;
 for (season of data) {
   if (minYear === null || minYear > season.year) minYear = season.year;
   if (maxYear === null || maxYear < season.year) maxYear = season.year;
-  const seasonGames = season.wins + season.draws + seasons.losses;
+  const seasonGames = season.wins + season.draws + season.losses;
   if (maxTotalGames === null || maxTotalGames < seasonGames) maxTotalGames = seasonGames;
   if (minPoints === null || season.points < minPoints) minPoints = season.points;
   if (maxPoints === null || season.points > maxPoints) maxPoints = season.points;
 }
+var xRange = d3.scaleLinear()
+  .range([margin.left, width - margin.right])
+  .domain([d3.min(data, d =>d.year), d3.max(data, d=>d.year)]);
+var yRange = d3.scaleLinear()
+  .range([height - margin.top, margin.bottom])
+  .domain([d3.min(data, d => d.points), d3.max(data, d =>d.points)]);
 
 // Create axes
 
+var xAxis = d3.axisBottom(xRange);
 
+var yAxis = d3.axisLeft(yRange);
 
 // Append the axes as G
 
+svg.append('svg:g')
+  .attr('class', 'x axis')
+  .attr('transform', 'translate(0,' + (height - margin.bottom) + ')')
+  .call(xAxis);
 
-
-
+svg.append('svg:g')
+  .attr('class', 'y axis')
+  .attr('transform', 'translate(' + (margin.left) + ',0)')
+  .call(yAxis);
 
 // Create Bars or Line function
 
+var lineFunc = d3.line()
+  .x(d => xRange(d.year))
+  .y(d => yRange(d.score));
 
-
+svg.append('svg:path')
+  .attr('d', lineFunc(data))
+  .attr('stroke', 'blue')
+  .attr('stroke-width', 2)
+  .attr('fill', 'none');
 
 // Create Circle group
 
@@ -88,4 +108,4 @@ for (season of data) {
 
 // Legend function
 
-})
+})();
