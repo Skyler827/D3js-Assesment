@@ -40,14 +40,6 @@ await reqDone;
 
 // Set scales
 
-// X axis: from min year to max year, inclusive
-// left Y axis: from zero to maxTotalGames, inclusive
-// right Y axis: from minPoints to maxPoints
-minYear = null;
-maxYear = null;
-maxTotalGames = null;
-minPoints = null;
-maxPoints = null;
 for (season of data) {
   if (minYear === null || minYear > season.year) minYear = season.year;
   if (maxYear === null || maxYear < season.year) maxYear = season.year;
