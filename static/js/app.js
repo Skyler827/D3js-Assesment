@@ -40,14 +40,6 @@ await reqDone;
 
 // Set scales
 
-for (season of data) {
-  if (minYear === null || minYear > season.year) minYear = season.year;
-  if (maxYear === null || maxYear < season.year) maxYear = season.year;
-  const seasonGames = season.wins + season.draws + season.losses;
-  if (maxTotalGames === null || maxTotalGames < seasonGames) maxTotalGames = seasonGames;
-  if (minPoints === null || season.points < minPoints) minPoints = season.points;
-  if (maxPoints === null || season.points > maxPoints) maxPoints = season.points;
-}
 var xRange = d3.scaleLinear()
   .range([margin.left, width - margin.right])
   .domain([d3.min(data, d =>d.year), d3.max(data, d=>d.year)]);
