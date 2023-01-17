@@ -20,10 +20,6 @@ var svg = d3.select('#svg-area')
             .attr('width', svgWidth)
             .attr('height', svgHeight);
 
-var tooltip = d3.select('body')
-                .append('div')
-                .attr('class', 'tooltip')
-                .attr('opacity', '0');
 
 // Read and arrange the data
 
@@ -44,7 +40,7 @@ await reqDone;
 
 var totalGames = (d) => d.wins + d.draws + d.losses;
 const maxTotalGames = d3.max(data, totalGames);
-console.log("max total games: "+maxTotalGames);
+
 var xRange = d3.scaleLinear()
   .range([margin.left, width - margin.right])
   .domain([d3.min(data, d =>d.year)-0.5, d3.max(data, d=>d.year)+0.5]);
@@ -64,9 +60,6 @@ var xAxis = d3.axisBottom(xRange)
   .tickFormat(d3.format(".0f"))
   // .tickValues(data.map(d => d.year-0.5))
 
-console.log("x axis:");
-  console.log(xAxis);
-  console.log(xAxis.tickValues());
 
 var yAxisLeft = d3.axisLeft(yRangeLeft);
 // console.log(yAxisLeft);
@@ -96,10 +89,14 @@ var lineFunc = d3.line()
   .x(d => xRange(d.year))
   .y(d => yRangeLeft(d.points));
 
-// console.log(data);
-// console.log(lineFunc(data));
-console.log("total games:");
-console.log(data.map(totalGames).map(yRangeRight));
+function showTooltip(d,i) {
+  const tooltip = document.querySelector("div.y"+d.year);
+  tooltip.classList.add("tooltip-show");
+}
+function hideTooltip(d,i) {
+  const tooltip = document.querySelector("div.y"+d.year);
+  tooltip.classList.remove("tooltip-show");
+}
 // wins:
 svg.append('svg:g')
   .selectAll('rect')
@@ -110,9 +107,9 @@ svg.append('svg:g')
   .attr('y', d => yRangeRight(totalGames(d)))
   .attr('width', widthPerUnit*0.9)
   .attr('height', d=> yRangeRightHeight(d.wins))
-  .attr('fill', 'green')
-console.log(data[0].wins);
-console.log(yRangeRightHeight(data[0].wins));
+  .attr('class', d=> 'bar wins y'+d.year)
+  .on('mouseover', showTooltip)
+  .on('mouseout', hideTooltip);
 
 //draws:
 svg.append('svg:g')
@@ -124,7 +121,10 @@ svg.append('svg:g')
   .attr('y', d=> yRangeRight(d.draws + d.losses))
   .attr('width', widthPerUnit*0.9)
   .attr('height', d=> yRangeRightHeight(d.draws))
-  .attr('fill', 'yellow')
+  .attr('class', d=> 'bar draws y'+d.year)
+  .on('mouseover', showTooltip)
+  .on('mouseout', hideTooltip);
+
 //losses:
 svg.append('svg:g')
   .selectAll('rect')
@@ -133,14 +133,16 @@ svg.append('svg:g')
   .append('svg:rect')
   .attr('x', d => xRange(d.year) - widthPerUnit/2)
   .attr('y', d => yRangeRight(d.losses))
-  .attr('width', widthPerUnit)
+  .attr('width', widthPerUnit*0.9)
   .attr('height', d=> yRangeRightHeight(d.losses))
-  .attr('fill', 'red')
+  .attr('class', d=>'bar losses y'+d.year)
+  .on('mouseover', showTooltip)
+  .on('mouseout', hideTooltip);
 
 svg.append('svg:path')
   .attr('d', lineFunc(data))
-  .attr('stroke', 'blue')
-  .attr('stroke-width', 2)
+  .attr('stroke', 'skyblue')
+  .attr('stroke-width', 4)
   .attr('fill', 'none');
 
   svg.append("text")
@@ -179,13 +181,29 @@ svg.append('svg:path')
 // Create Circle group
 
 
+// tooltip
+const tooltipContainer = document.querySelector(".tooltip-container");
+const titleHeight = document.querySelector("#Plot_title").offsetHeight;
+console.log(titleHeight); 
+for (const d of data) {
+  const newTooltip = document.createElement("div");
+  newTooltip.classList.add("tooltip");
+  newTooltip.classList.add(`y${d.year}`)
+  newTooltip.style.left = (xRange(d.year)+widthPerUnit/2)+"px";
+  newTooltip.style.top = (2* margin.top+titleHeight)+"px";
+  newTooltip.innerHTML = `<h2>${d.year}</h2>
+<p>Coach: ${d.other.coach}</p>
+<p>Placement: ${d.other.finished}</p>
+<p>Points: ${d.points}</p>
+<p>Wins: ${d.wins}</p>
+<p>Draws: ${d.draws}</p>
+<p>Losses: ${d.losses}</p>
+`
+  tooltipContainer.appendChild(newTooltip);
 
-
+}
 // Mouseover / mouseout
 
-
-
-// tooltip
 
 
 
