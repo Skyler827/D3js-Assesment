@@ -35,3 +35,17 @@ rect:hover{
   fill: #FFFF00;
   transition: 0.5s all ease-in;
 }
+
+.y-label-left {
+  fill:blue;
+}
+
+.y-label-right-wins {
+  fill: green;
+}
+.y-label-right-draws {
+  fill: yellow;
+}
+.y-label-right-losses {
+  fill: red;
+}
